@@ -16,9 +16,17 @@ class JWTToken
       'exp' => time()+60*60,
       'userEmail' => $userEmail,
     ];
-
     return JWT::encode($payload, $key, 'HS256');
-
+  }
+  public static function CreateTokenForResetPassword($userEmail) {
+    $key = env('JWT_KEY');
+    $payload = [
+      'iss' => 'laravel-token',
+      'iat' => time(),
+      'exp' => time()+60*20,
+      'userEmail' => $userEmail,
+    ];
+    return JWT::encode($payload, $key, 'HS256');
   }
 
   public static function VerifyToken($token) {
@@ -27,7 +35,7 @@ class JWTToken
 
       $decode = JWT::decode($token, new Key($key, 'HS256'));
       return $decode->userEmail;
-    } 
+    }
     catch (Exception $e) {
       return 'Unauthorized';
     }
