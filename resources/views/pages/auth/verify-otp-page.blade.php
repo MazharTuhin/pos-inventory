@@ -1,3 +1,4 @@
-<div>
-    <!-- Do what you can, with what you have, where you are. - Theodore Roosevelt -->
-</div>
+@extends('layout.app')
+@section('content')
+    @include('components.auth.verify-otp-form')
+@endsection

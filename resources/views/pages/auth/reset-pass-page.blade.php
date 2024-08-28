@@ -1,3 +1,4 @@
-<div>
-    <!-- Always remember that you are absolutely unique. Just like everyone else. - Margaret Mead -->
-</div>
+@extends('layout.app')
+@section('content')
+    @include('components.auth.reset-pass-form')
+@endsection

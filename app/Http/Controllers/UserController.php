@@ -8,9 +8,37 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\View\View;
 
 class UserController extends Controller
 {
+    // Frontend
+    public function LoginPage():View {
+        return view('pages.auth.login-page');
+    }
+
+    public function RegistrationPage():View {
+        return view('pages.auth.registration-page');
+    }
+
+    public function SendOtpPage():View {
+        return view('pages.auth.send-otp-page');
+    }
+
+    public function VerifyOtpPage():View {
+        return view('pages.auth.verify-otp-page');
+    }
+
+    public function ResetPasswordPage():View {
+        return view('pages.auth.reset-pass-page');
+    }
+
+    public function ProfilePage():View {
+        return view('pages.dashboard.profile-page');
+    }
+
+
+    // Backend
     public function UserRegistration(Request $request) {
         try {
             User::create([
@@ -25,7 +53,7 @@ class UserController extends Controller
                 'status' => 'success',
                 'message' => 'User Registration Successful'
             ]);
-        } catch (Exception $e) {
+        } catch (Exception $exception) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'User Registration Failed for Internal Error'
@@ -36,21 +64,20 @@ class UserController extends Controller
     public function UserLogin(Request $request) {
         $count = User::where('email', $request->input('email'))
                         ->where('password', $request->input('password'))
-                        ->count();
+                        ->select('id')->first();
 
-        if ($count == 1) {
-            $token = JWTToken::CreateToken($request->input('email'));
+        if ($count !== null) {
+            $token = JWTToken::CreateToken($request->input('email'), $count->id);
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'User Login Successful',
-                'token' => $token,
-            ], 200);
+            ], 200)->cookie('token', $token, time()+60*24*30);
         }
         else {
             return response()->json([
                'status' => 'failed',
-               'message' => 'Unauthorized',
+               'message' => 'unauthorized',
             ], 401);
         }
     }
@@ -91,13 +118,12 @@ class UserController extends Controller
             return response()->json([
                'status' => 'success',
                'message' => 'OTP Verify Successful',
-               'token' => $token,
-            ]);
+            ])->cookie('token', $token, 60*24*30);
         }else {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'User Unauthorized',
-            ], 401);
+            ], 500);
         }
     }
 
@@ -115,6 +141,46 @@ class UserController extends Controller
                 'status' => 'failed',
                 'message' => 'Password Reset Failed for Internal Error',
             ], 500);
+        }
+    }
+
+    public function UserLogout() {
+        return redirect('/userLogin')->cookie('token', '', '-1');
+    }
+
+    public function UserProfile(Request $request) {
+        $email = $request->header('email');
+        $user = User::where('email', $email)->first();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User Profile Request Successful',
+            'data' => $user,
+        ], 200);
+    }
+
+    public function UpdateProfile(Request $request) {
+        try {
+            $email = $request->header('email');
+            $firstName = $request->input('firstName');
+            $lastName = $request->input('lastName');
+            $mobile = $request->input('mobile');
+            $password = $request->input('password');
+            User::where('email', $email)->update([
+                'firstName' => $firstName,
+                'lastName' => $lastName,
+                'mobile' => $mobile,
+                'password' => $password,
+            ]);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'User Profile Update Successful',
+            ]);
+        }
+        catch (Exception $exception) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Request Failed for Internal Error',
+            ]);
         }
     }
 
