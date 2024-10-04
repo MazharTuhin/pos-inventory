@@ -15,7 +15,7 @@ class JWTToken
       'iat' => time(),
       'exp' => time()+60*60,
       'userEmail' => $userEmail,
-      'userId' => $userId,
+      'userId' => $userId
     ];
     return JWT::encode($payload, $key, 'HS256');
   }
@@ -24,9 +24,8 @@ class JWTToken
     $payload = [
       'iss' => 'laravel-token',
       'iat' => time(),
-      'exp' => time()+60*20,
+      'exp' => time()+60*15,
       'userEmail' => $userEmail,
-      'userId' => '0'
     ];
     return JWT::encode($payload, $key, 'HS256');
   }
@@ -44,7 +43,7 @@ class JWTToken
       }
     }
     catch (Exception $e) {
-      return 'unauthorized';
+      return "unauthorized";
     }
   }
 }

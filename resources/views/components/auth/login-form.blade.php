@@ -29,24 +29,28 @@
         let email = document.getElementById('email').value;
         let password = document.getElementById('password').value;
 
-        if (email.length === 0) {
-            errorToast("Email is required");
-        }
-        else if (password.length === 0) {
-            errorToast("Password is required");
-        }
-        else {
-            showLoader();
-            let response = await axios.post("/user-login", {email:email, password:password});
+        showLoader();
+        try {
+            let res = await axios.post("/user-login", { email: email, password: password });
             hideLoader();
-
-            if (response.status === 200 && response.data['status'] === 'success') {
-                window.location.href = "/dashboard";
+            if (res.status === 200 && res.data['status'] === 'success') {
+                successToast(res.data['message']);
+                setTimeout(function (){
+                    window.location.href='/dashboard';
+                },500)
             }
-            else {
-                errorToast(res.data['message']);
+        } catch (error) {
+            hideLoader();
+            if (error.response.status === 422) {
+                const errors = error.response.data.errors;
+                Object.keys(errors).forEach(key => {
+                    errorToast(`${errors[key][0]}`);
+                });
+            } else if (error.response.status === 401) {
+                errorToast(error.response.data['message']);
+            } else {
+                errorToast("An error occurred. Please try again.");
             }
         }
     }
-
 </script>

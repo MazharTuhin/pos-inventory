@@ -18,26 +18,30 @@
 <script>
     async function VerifyOtp() {
         let otp = document.getElementById('otp').value;
-        if(otp.length !== 6) {
-            errorToast('Invalid OTP');
-        }
-        else {
-            showLoader();
-            let response = await axios.post('/verify-otp', {
-                otp: otp,
-                email:sessionStorage.getItem('email'),
-            });
-            hideLoader();
 
-            if(response.status === 200 && response.data['status'] === 'success') {
-                successToast(response.data['message']);
+        showLoader();
+        try {
+            let res = await axios.post('/verify-otp', {otp : otp, email: sessionStorage.getItem('email')});
+            hideLoader()
+            if (res.status === 200 && res.data['status'] === 'success') {
+                successToast(res.data['message']);
                 sessionStorage.clear();
-                setTimeout(() => {
-                    window.location.href = '/resetPassword'
+                setTimeout(function() {
+                    window.location.href = '/resetPassword';
                 }, 1000);
             }
-            else{
-                errorToast(response.data['message'])
+        }
+        catch (error) {
+            hideLoader();
+            if (error.response.status === 422) {
+                const errors = error.response.data.errors;
+                Object.keys(errors).forEach(key => {
+                    errorToast(`${errors[key][0]}`);
+                });
+            } else if (error.response.status === 401) {
+                errorToast(error.response.data['message']);
+            } else {
+                errorToast("An error occurred. Please try again.");
             }
         }
     }

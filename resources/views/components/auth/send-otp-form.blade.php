@@ -17,26 +17,32 @@
 
 <script>
     async function VerifyEmail() {
-         let email = document.getElementById("email").value;
-         if(email.length === 0){
-            errorToast('Please enter your email address');
-         }
-         else{
-             showLoader();
-             let res = await axios.post('/send-otp', {email: email});
-             hideLoader();
-             if(res.status===200 && res.data['status']==='success'){
-                 successToast(res.data['message'])
-                 sessionStorage.setItem('email', email);
-                 setTimeout(function (){
-                     window.location.href = '/verifyOtp';
-                 }, 1000)
-             }
-             else{
-                 errorToast(res.data['message'])
-             }
-         }
- 
-     }
- </script>
- 
+        let email = document.getElementById('email').value;
+
+        showLoader();
+        try {
+            let res = await axios.post('/send-otp', {email: email});
+            hideLoader();
+            if (res.status === 200 && res.data['status'] === 'success') {
+                successToast(res.data['message']);
+                sessionStorage.setItem('email', email)
+                setTimeout(function () {
+                    window.location.href = '/verifyOtp';
+                }, 1000)
+            }
+        }
+        catch (error) {
+            hideLoader();
+            if (error.response.status === 422) {
+                const errors = error.response.data.errors;
+                Object.keys(errors).forEach(key => {
+                    errorToast(`${errors[key][0]}`);
+                });
+            } else if (error.response.status === 401) {
+                errorToast(error.response.data['message']);
+            } else {
+                errorToast("An error occurred. Please try again.");
+            }
+        }
+    }
+</script>
