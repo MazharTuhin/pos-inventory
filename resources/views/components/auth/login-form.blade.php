@@ -37,7 +37,7 @@
                 successToast(res.data['message']);
                 setTimeout(function (){
                     window.location.href='/dashboard';
-                },500)
+                },300)
             }
         } catch (error) {
             hideLoader();

@@ -20,12 +20,10 @@ class TokenVerification
         $result = JWTToken::VerifyToken($token);
 
         if($result == "unauthorized") {
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'unauthorized'
-            ], 401);
+            return redirect('/userLogin');
         } else {
             $request->headers->set('email', $result->userEmail);
+            $request->headers->set('id', $result->userId);
             return $next($request);
         }
     }

@@ -160,7 +160,3 @@
 
     </div>
 </div>
-
-<script>
-    
-</script>
