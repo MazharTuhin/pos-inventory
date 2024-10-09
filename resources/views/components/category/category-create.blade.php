@@ -18,14 +18,14 @@
             </div>
             <div class="modal-footer">
                 <button id="modal-close" class="btn bg-gradient-primary" data-bs-dismiss="modal" aria-label="Close">Close</button>
-                <button onclick="CreateCategory()" id="save-btn" class="btn bg-gradient-success" >Save</button>
+                <button onclick="CategoryCreate()" id="save-btn" class="btn bg-gradient-success" >Save</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>    
-    async function CreateCategory() {
+    async function CategoryCreate() {
         let categoryName = document.getElementById('categoryName').value;
         try {
             showLoader();

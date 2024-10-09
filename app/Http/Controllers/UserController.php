@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Helper\JWTToken;
-use App\Mail\OTPMail;
-use Illuminate\Http\Request;
-use App\Models\User;
 use Exception;
+use App\Models\User;
+use App\Mail\OTPMail;
+use App\Helper\JWTToken;
+use Illuminate\View\View;
+use function Ramsey\Uuid\v1;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cookie;
+
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-use Illuminate\View\View;
-use Illuminate\Support\Carbon;
-
-use function Ramsey\Uuid\v1;
 
 class UserController extends Controller
 {
@@ -97,7 +98,7 @@ class UserController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'User Login Successfull',
-            ], 200)->cookie('token', $token, 60*24*30);
+            ], 200)->cookie('token', $token, strtotime(Carbon::now()->tz('Asia/Dhaka')->addDays(30)));
         }
         else {
             return response()->json([
@@ -205,10 +206,11 @@ class UserController extends Controller
     }
 
     public function UserLogout(Request $request) {
-        return response()->json([
-            'status' => 'success',
-            'message' => 'User Logout Successful',
-        ])->cookie('token', null, -1);
+        // return response()->json([
+        //     'status' => 'success',
+        //     'message' => 'User Logout Successful',
+        // ])->cookie(Cookie::forget('token'));
+        return redirect(url('/userLogin'))->withCookie(Cookie::forget('token'));
     }
 
     public function UserProfile(Request $request) {

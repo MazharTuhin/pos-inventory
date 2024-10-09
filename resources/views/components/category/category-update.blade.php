@@ -19,8 +19,50 @@
             </div>
             <div class="modal-footer">
                 <button id="update-modal-close" class="btn bg-gradient-primary" data-bs-dismiss="modal" aria-label="Close">Close</button>
-                <button onclick="Update()" id="update-btn" class="btn bg-gradient-success" >Update</button>
+                <button onclick="CategoryUpdate()" id="update-btn" class="btn bg-gradient-success" >Update</button>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    async function FillUpdateForm(id) {
+        document.getElementById('updateID').value = id;
+        showLoader();
+        let res = await axios.post('/category-by-id', {id: id});
+        hideLoader()
+
+        document.getElementById('categoryNameUpdate').value = res.data['name'];
+    }
+
+    async function CategoryUpdate() {
+        let categoryName = document.getElementById('categoryNameUpdate').value;
+        let categoryId = document.getElementById('updateID').value;
+
+        try {
+            showLoader();
+            let res = await axios.post('/category-update', {name: categoryName, id: categoryId});
+            hideLoader();
+
+            if (res.status === 200 && res.data['status'] === 'success') {
+                document.getElementById('update-modal-close').click();
+                successToast(res.data['message']);
+                document.getElementById('update-form').reset();
+
+                await GetList();
+            }
+        }
+        catch(error) {
+            hideLoader();
+            if(error.response.status === 422) {
+                const errors = error.response.data.errors;
+                Object.keys(errors).forEach(key => {
+                    errorToast(`${errors[key][0]}`)
+                });
+            }
+            else {
+                errorToast("An error occurred. Please try again.")
+            }
+        }
+    }
+</script>
