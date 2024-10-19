@@ -43,7 +43,7 @@ Route::get('/dashboard', [DashboardController::class, 'DashboardPage'])->middlew
 Route::get('/userProfile', [UserController::class, 'ProfilePage'])->middleware(TokenVerification::class);
 Route::get('/categoryPage', [CategoryController::class, 'CategoryPage'])->middleware(TokenVerification::class);
 Route::get('/customerPage', [CustomerController::class, 'CustomerPage'])->middleware(TokenVerification::class);
-Route::get('/productPage', [CategoryController::class, 'ProductPage'])->middleware(TokenVerification::class);
+Route::get('/productPage', [ProductController::class, 'ProductPage'])->middleware(TokenVerification::class);
 
 
 // Category
