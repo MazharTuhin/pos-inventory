@@ -1,12 +1,14 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ReportController;
+use App\Http\Middleware\TokenVerification;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ProductController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserController;
-use App\Http\Middleware\TokenVerification;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,6 +46,10 @@ Route::get('/userProfile', [UserController::class, 'ProfilePage'])->middleware(T
 Route::get('/categoryPage', [CategoryController::class, 'CategoryPage'])->middleware(TokenVerification::class);
 Route::get('/customerPage', [CustomerController::class, 'CustomerPage'])->middleware(TokenVerification::class);
 Route::get('/productPage', [ProductController::class, 'ProductPage'])->middleware(TokenVerification::class);
+Route::get('/invoicePage', [InvoiceController::class, 'InvoicePage'])->middleware(TokenVerification::class);
+Route::get('/salePage', [InvoiceController::class, 'SalePage'])->middleware(TokenVerification::class);
+Route::get('/reportPage',[ReportController::class,'ReportPage'])->middleware([TokenVerification::class]);
+
 
 
 // Category
@@ -67,3 +73,15 @@ Route::post('/product-by-id', [ProductController::class, 'ProductById'])->middle
 // Route::get('/product-by/{product_id}', [ProductController::class, 'ProductBy'])->middleware(TokenVerification::class);
 Route::post('/product-update', [ProductController::class, 'ProductUpdate'])->middleware(TokenVerification::class);
 Route::post('/product-delete', [ProductController::class, 'ProductDelete'])->middleware(TokenVerification::class);
+
+// Invoice
+Route::post('/invoice-create', [InvoiceController::class, 'InvoiceCreate'])->middleware(TokenVerification::class);
+Route::get('/invoice-select', [InvoiceController::class, 'InvoiceSelect'])->middleware(TokenVerification::class);
+Route::post('/invoice-details', [InvoiceController::class, 'InvoiceDetails'])->middleware(TokenVerification::class);
+Route::post('/invoice-update', [InvoiceController::class, 'InvoiceUpdate'])->middleware(TokenVerification::class);
+Route::post('/invoice-delete', [InvoiceController::class, 'InvoiceDelete'])->middleware(TokenVerification::class);
+
+
+// Summary and Report
+Route::get('/summary', [DashboardController::class, 'Summary'])->middleware(TokenVerification::class);
+Route::get('/sales-report/{FromDate}/{ToDate}', [ReportController::class, 'SalesReport'])->middleware(TokenVerification::class);
